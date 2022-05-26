@@ -1,0 +1,291 @@
+#include <stdio.h>
+#include <conio.h>
+#include <windows.h>
+#include <time.h>
+#include <stdlib.h>
+
+int gameover, score;
+int oyun_alan[80][23]={0};
+int kuyrukSutun[500];
+int kuyrukSatir[500];
+int maap[80][23]={0};
+int can;
+
+void gotoxy(short x, short y) {
+    HANDLE hConsoleOutput;
+    COORD Cursor_Pos = {x-1, y-1};
+
+    hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorPosition(hConsoleOutput, Cursor_Pos);
+}
+
+void cerceve(int x1, int y1, int x2, int y2,int tur)
+{
+    int i;
+    for(i=x1; i<=x2;i++)
+    {
+       oyun_alan[i][y1] = tur;
+
+        oyun_alan[i][y2] = tur;
+
+    }
+    for(i=y1; i<=y2;i++)
+    {
+       oyun_alan[x1][i] = tur;
+
+        oyun_alan[x2][i] = tur;
+
+    }
+}
+
+void ekrani_cagir()
+{ system("color 0a");
+    int x,y;
+    for(x=0;x<80;x++)
+    {
+
+
+        for(y=0;y<23;y++)
+        {
+        gotoxy(x+1,y+1);
+            if(oyun_alan[x][y]==1)
+            {
+                printf("%c",219);
+            }
+
+            else if(oyun_alan[x][y]==2)
+            {
+                printf("%c",176);
+            }
+            else if(oyun_alan[x][y]==3)
+                printf("%c",88);
+
+        }
+    }
+}
+
+
+int oyemx,oyemy;
+randomAta()
+{
+    srand(time(NULL));
+    oyemx=4+rand()%65;
+    oyemy=4+rand()%15;
+}
+struct Oyuncu_kayit{
+	char oyuncu_Ad[20];
+	char oyuncu_Soyad[30];
+	int oyuncu_No;
+	char oyuncu_cinsiyet[10];
+	int oyuncu_yas;
+	int oyuncu_skor;
+
+}oyncu1[50];
+
+void main()
+{
+    FILE *pdosya;
+	pdosya=fopen("oyuncu_verileri.txt","a+");
+
+	int a,b;
+	int kisisayisi;
+	 system("color af");
+	 printf("Lutfen kisi sayisini girin:  ");
+	 scanf("%d",&kisisayisi);
+	 system("cls");
+
+    fprintf(pdosya,"\n||||||||||||||||||||SNAKE GAME||||||||||||||||||||\n\n");
+    fprintf(pdosya,"   Ad    Soyad \tNumara \tCinsiyet      Yas \tskor\n");
+
+
+	for(a=0;a<kisisayisi;a++){
+
+   printf("||||||||||||||||||| SNAKE GAME ||||||||||||||||||||\n");
+   oyncu1[a].oyuncu_skor=score; //program tamamlandiginda skor dogru bir sekilde kayit edilecektir.
+     gotoxy(84,3);printf("Snake Game'e Hos Geldin...\n ");
+ 	 gotoxy(84,4);printf("Oyuna Baslamadan Once Kayit olmalisin.\n");
+ 	 gotoxy(84,5);getch();
+ 	 gotoxy(84,6);printf("OYUNCU KAYIT\n");
+	 gotoxy(84,7);printf("Adiniz: ");
+	 gotoxy(84,8);scanf("%s",&oyncu1[a].oyuncu_Ad);
+	 gotoxy(84,9);printf("Soyadiniz: ");
+	 gotoxy(84,10);scanf("%s",&oyncu1[a].oyuncu_Soyad);
+	 gotoxy(84,11);printf("Numarinizi Giriniz: ");
+	 gotoxy(84,12);scanf("%d",&oyncu1[a].oyuncu_No);
+	 gotoxy(84,13);printf("Cinsiyetinizi Giriniz: ");
+	 gotoxy(84,14);scanf("%s",&oyncu1[a].oyuncu_cinsiyet);
+	 gotoxy(84,15);printf("Yasinizi Giriniz: ");
+	 gotoxy(84,16);scanf("%d",&oyncu1[a].oyuncu_yas);
+	 gotoxy(84,17);printf("Bilgileriniz Basariyla Kayit Edildi");
+	 gotoxy(84,19);printf("!!!NE KADAR OYUN HAKKI ISTERSINIZ:!!!");
+	 gotoxy(84,20);scanf("%d",&can);
+	 gotoxy(84,21);printf("Haydi Oyuna Baslayalim");
+	 gotoxy(84,22);printf("Baslamak icin Herhangi bir tusa basiniz");
+	 gotoxy(84,23);getch();
+
+	printf("\n\n\n\n\n\n\n\n\n");
+    randomAta();
+    cerceve(0,0,79,22,2);
+    ekrani_cagir();
+    int snakex=40,snakey=12;
+    int addy=0,addx=0;
+    unsigned char tus;
+    int skor=0;
+    int devam=0;
+    int kisisayisi;
+
+    do
+    {
+        if(kbhit())
+        {
+            tus=getch();
+            if(tus==224)
+            {
+                tus=getch();
+                switch(tus)
+                {
+                    case 72: addy=-1; addx=0;
+                        break;
+                    case 80: addy=1;  addx=0;
+                        break;
+                    case 77: addx=1;  addy=0;
+                        break;
+                    case 75: addx=-1; addy=0;
+                }
+            }
+        }
+         gotoxy(72,2);printf("CAN: %d",can);
+
+        snakex=snakex+addx;
+        snakey=snakey+addy;
+        if(snakex>78)
+           {
+		   snakex=2;
+		   can--;
+		     if(can==0)
+
+		   {
+		        gotoxy(72,2);printf("CAN: %d",can);
+		        gotoxy(35,19);printf("Oyun can hakkiniz bitmistir.");
+                gotoxy(35,20);printf("OYUN BITTI");
+                gotoxy(35,18);printf("SKORUNUZ: %d",oyncu1[a].oyuncu_skor);
+				getch();
+                devam=1;
+            }
+            }
+
+        if(snakex<2)
+            {snakex=78;
+            can--;
+                 if(can==0)
+
+		   {
+		        gotoxy(72,2);printf("CAN: %d",can);
+		        gotoxy(35,19);printf("Oyun can hakkiniz bitmistir.");
+                gotoxy(35,20);printf("OYUN BITTI");
+                gotoxy(35,18);printf("SKORUNUZ: %d",oyncu1[a].oyuncu_skor);
+				getch();
+                devam=1;
+            }
+            }
+
+        if(snakey>22)
+            {snakey=2;
+            can--;
+                if(can==0)
+
+		   {
+		        gotoxy(72,2);printf("CAN: %d",can);
+		        gotoxy(35,19);printf("Oyun can hakkiniz bitmistir.");
+                gotoxy(35,20);printf("OYUN BITTI");
+                gotoxy(35,18);printf("SKORUNUZ: %d",oyncu1[a].oyuncu_skor);
+				getch();
+                devam=1;
+            }
+            }
+
+        if(snakey<2)
+             {snakey=22;
+             can--;
+                 if(can==0)
+
+		   {
+		        gotoxy(72,2);printf("CAN: %d",can);
+		        gotoxy(35,19);printf("Oyun can hakkiniz bitmistir.");
+                gotoxy(35,20);printf("OYUN BITTI");
+                gotoxy(35,18);printf("SKORUNUZ: %d",oyncu1[a].oyuncu_skor);
+				getch();
+                devam=1;
+            }
+            }
+
+        kuyrukSutun[0]=snakex;
+        kuyrukSatir[0]=snakey;
+        int i;
+        for(i=1;i<=oyncu1[a].oyuncu_skor;i++)
+        {
+            if((snakex==kuyrukSutun[i] && snakey==kuyrukSatir[i]))
+
+            {
+			gotoxy(snakex,snakey);
+            can--;
+                 if(can==0)
+
+		   {
+		        gotoxy(72,2);printf("CAN: %d",can);
+		        gotoxy(35,19);printf("Oyun can hakkiniz bitmistir.");
+                gotoxy(35,20);printf("OYUN BITTI");
+                gotoxy(35,18);printf("SKORUNUZ: %d",oyncu1[a].oyuncu_skor);
+				getch();
+                devam=1;
+            }
+            }
+        }
+
+        gotoxy(snakex,snakey);printf("%c",254);
+
+        for(i=0;i<=oyncu1[a].oyuncu_skor;i++)
+        {
+            gotoxy(kuyrukSutun[i],kuyrukSatir[i]);printf("%c",254);
+
+        }
+
+
+        if(snakex==oyemx && snakey==oyemy)
+        {
+            randomAta();
+            oyncu1[a].oyuncu_skor++;
+            gotoxy(2,2);printf("Skor: %d",oyncu1[a].oyuncu_skor);
+
+        }
+
+        gotoxy(oyemx,oyemy);printf("o");
+
+        Sleep(50);
+
+        gotoxy(snakex,snakey);printf(" ");
+
+
+        for(i=0;i<=oyncu1[a].oyuncu_skor;i++)
+        {
+            gotoxy(kuyrukSutun[i],kuyrukSatir[i]);printf(" ");
+
+        }
+        for(i=oyncu1[a].oyuncu_skor;i>0;i--)
+        {
+            kuyrukSutun[i]=kuyrukSutun[i-1];
+            kuyrukSatir[i]=kuyrukSatir[i-1];
+        }
+
+    } while (devam==0);
+
+	fprintf(pdosya,"%s[%s]%s","\n",oyncu1[a].oyuncu_Ad," ");
+	fprintf(pdosya,"[%s]%s",oyncu1[a].oyuncu_Soyad,"    ");
+	fprintf(pdosya,"[%d]%s",oyncu1[a].oyuncu_No,"    ");
+	fprintf(pdosya,"[%s]%s",oyncu1[a].oyuncu_cinsiyet,"      ");
+	fprintf(pdosya,"[%d]%s",oyncu1[a].oyuncu_yas,"         ");
+	fprintf(pdosya,"[%d]%s",oyncu1[a].oyuncu_skor,"\n");
+	system("cls");
+    }
+	fclose(pdosya);
+}
